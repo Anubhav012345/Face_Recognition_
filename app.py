@@ -1,0 +1,49 @@
+import streamlit as st
+import cv2
+import numpy as np
+from PIL import Image
+
+st.set_page_config(page_title="Face Recognition")
+
+st.title("Face Recognition System")
+
+st.write("Upload an image for face detection")
+
+uploaded_file = st.file_uploader(
+    "Choose an image",
+    type=["jpg", "jpeg", "png"]
+)
+
+if uploaded_file is not None:
+
+    image = Image.open(uploaded_file)
+    img = np.array(image)
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    face_cascade = cv2.CascadeClassifier(
+        "haarcascade_frontalface_default.xml"
+    )
+
+    faces = face_cascade.detectMultiScale(
+        gray,
+        scaleFactor=1.1,
+        minNeighbors=4
+    )
+
+    for (x, y, w, h) in faces:
+        cv2.rectangle(
+            img,
+            (x, y),
+            (x+w, y+h),
+            (0, 255, 0),
+            3
+        )
+
+    st.image(
+        img,
+        caption="Detected Faces",
+        use_container_width=True
+    )
+
+    st.write(f"Faces Detected: {len(faces)}")
